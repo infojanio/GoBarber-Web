@@ -3,8 +3,9 @@ import * as Yup from 'yup';
 import { FormHandles } from '@unform/core';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
-import { Container, Content, Background } from './styles';
+import { Link, useHistory } from 'react-router-dom';
 
+import { Container, Content, Background, AnimationContainer } from './styles';
 import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import logoImg from '../../assets/logo.svg';
@@ -22,6 +23,7 @@ const Signin: React.FC = () => {
 
   const { signIn } = useAuth(); // carrega o dado da autenticação
   const { addToast } = useToast();
+  const history = useHistory();
 
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {
@@ -41,10 +43,13 @@ const Signin: React.FC = () => {
           email: data.email,
           password: data.password,
         }); // chama método do AuthContext.tsx
+
+        history.push('/dashboard');
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
           formRef.current?.setErrors(errors);
+          return; // P/ não executar o restante do código
         }
         addToast({
           type: 'error',
@@ -54,32 +59,36 @@ const Signin: React.FC = () => {
         }); // dispara um Toas - mensagem personalizada de erro
       }
     },
-    [signIn, addToast], // toda variável externa que usamos no useCallBack, temos que passar como dependência
+    [signIn, addToast, history], // toda variável externa que usamos no useCallBack, temos que passar como dependência
   );
 
   return (
     <Container>
       <Content>
-        <img src={logoImg} alt="GoBarber" />
+        <AnimationContainer>
+          <img src={logoImg} alt="GoBarber" />
 
-        <Form ref={formRef} onSubmit={handleSubmit}>
-          <h1>Faça seu Logon</h1>
-          <Input name="email" icon={FiMail} placeholder="Email" />
-          <Input
-            name="password"
-            icon={FiLock}
-            placeholder="Senha"
-            type="password"
-          />
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            <h1>Faça seu logon</h1>
 
-          <Button type="submit">Entrar</Button>
-          <a href="forgot">Esqueci minha senha</a>
-        </Form>
+            <Input icon={FiMail} name="email" placeholder="E-mail" />
+            <Input
+              icon={FiLock}
+              name="password"
+              type="password"
+              placeholder="Senha"
+            />
 
-        <a href="login">
-          <FiLogIn />
-          Criar Conta
-        </a>
+            <Button type="submit">Entrar</Button>
+
+            <a href="forgot">Esqueci minha senha</a>
+          </Form>
+
+          <Link to="/signup">
+            <FiLogIn />
+            Criar conta
+          </Link>
+        </AnimationContainer>
       </Content>
       <Background />
     </Container>

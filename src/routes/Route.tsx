@@ -26,7 +26,7 @@ const Route: React.FC<RouteProps> = ({
   ...rest
 }) => {
   const { user } = useAuth();
-  console.log(user, isPrivate);
+  // console.log(user, isPrivate);
 
   return (
     <ReactDOMRoute
